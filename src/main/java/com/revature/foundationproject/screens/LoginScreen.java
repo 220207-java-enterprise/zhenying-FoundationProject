@@ -1,6 +1,7 @@
 package com.revature.foundationproject.screens;
 
 
+import com.revature.foundationproject.dtos.requests.LoginRequest;
 import com.revature.foundationproject.models.ErsUser;
 import com.revature.foundationproject.services.UserService;
 
@@ -19,15 +20,17 @@ public class LoginScreen extends Screen {
     @Override
     public void render() throws IOException {
 
+        LoginRequest loginRequest = new LoginRequest();
+
         System.out.println("Please provide your account credentials to login:");
 
         System.out.print("Username: ");
-        String username = consoleReader.readLine();
+        loginRequest.setUsername(consoleReader.readLine());
 
         System.out.print("Password: ");
-        String password = consoleReader.readLine();
+        loginRequest.setPassword(consoleReader.readLine());
 
-        ErsUser authenticatedUser = userService.login(username, password);
+        ErsUser authenticatedUser = userService.login(loginRequest);
         System.out.println(authenticatedUser); // TODO go somewhere from here?
 
     }
