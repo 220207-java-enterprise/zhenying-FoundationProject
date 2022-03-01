@@ -2,6 +2,7 @@ package com.revature.foundationproject.util;
 
 import com.revature.foundationproject.daos.UserDAO;
 import com.revature.foundationproject.screens.LoginScreen;
+import com.revature.foundationproject.screens.RegisterScreen;
 import com.revature.foundationproject.services.UserService;
 
 import java.io.BufferedReader;
@@ -22,6 +23,7 @@ public class AppState {
         UserDAO userDAO = new UserDAO();
         UserService userService = new UserService(userDAO); // injection like this is sometimes called "wiring"
         router.addScreen(new LoginScreen(consoleReader, userService)); // TODO probably will use the router in the future
+        router.addScreen(new RegisterScreen(consoleReader, userService));
 
         System.out.printf("Application initialization completed at %s\n", LocalDateTime.now());
 
@@ -29,7 +31,7 @@ public class AppState {
 
     public void startup() {
         while (appRunning) {
-            router.navigate("/login");
+            router.navigate("/register");
         }
     }
 
