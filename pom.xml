@@ -32,6 +32,12 @@
         </dependency>
 
         <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.9.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
             <version>${jackson.version}</version>
@@ -41,6 +47,12 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.17.2</version>
         </dependency>
 
         <dependency>
@@ -75,6 +87,38 @@
                 </plugin>
             </plugins>
         </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.6</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>com/revature/foundationproject/models/*</exclude>
+                                <exclude>com/revature/foundationproject/dtos/requests/*</exclude>
+                                <exclude>com/revature/foundationproject/dtos/responses/*</exclude>
+                                <exclude>com/revature/foundationproject/util/exceptions/*</exclude>
+                                <exclude>com/revature/foundationproject/servlets/*</exclude>
+                                <exclude>com/revature/foundationproject/daos/*</exclude>
+                                <exclude>con/revature/foundationproject/screens/*</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
 
