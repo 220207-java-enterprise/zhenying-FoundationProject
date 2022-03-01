@@ -89,9 +89,7 @@ public class UserService {
     }
 
     public boolean isRoleNameValid (String role_name){
-        if (role_name.equals("FINANCE_MANAGER") || role_name.equals("EMPLOYEE"))
-            return true;
-        return false;
+        return role_name.equals("FINANCE_MANAGER") || role_name.equals("EMPLOYEE");
     }
 
     public boolean isEmailValid(String email) {
