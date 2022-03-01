@@ -10,12 +10,13 @@ public class ErsUser {
     private String given_name;
     private String surname;
     private boolean is_active;
+    private ErsUserRole user_role;
 
     public ErsUser(){
         super();
     }
 
-    public ErsUser(String user_id, String username, String email, String password, String given_name, String surname, boolean is_active) {
+    public ErsUser(String user_id, String username, String email, String password, String given_name, String surname, boolean is_active, ErsUserRole user_role) {
         this.user_id = user_id;
         this.username = username;
         this.email = email;
@@ -23,6 +24,15 @@ public class ErsUser {
         this.given_name = given_name;
         this.surname = surname;
         this.is_active = is_active;
+        this.user_role = user_role;
+    }
+
+    public ErsUser(String username, String email, String password, String given_name, String surname) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.given_name = given_name;
+        this.surname = surname;
     }
 
     public void setUser_id(String user_id) {
@@ -53,6 +63,8 @@ public class ErsUser {
         this.is_active = is_active;
     }
 
+    public void setRole(ErsUserRole user_role){ this.user_role = user_role; }
+
     public String getUser_id() {
         return user_id;
     }
@@ -77,22 +89,11 @@ public class ErsUser {
         return surname;
     }
 
-    public boolean isIs_active() {
+    public boolean getIs_active() {
         return is_active;
     }
 
-    @Override
-    public String toString() {
-        return "ErsUser{" +
-                "user_id='" + user_id + '\'' +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", given_name='" + given_name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", is_active=" + is_active +
-                '}';
-    }
+    public ErsUserRole getRole(){ return  user_role; }
 
     @Override
     public int hashCode() {
@@ -111,6 +112,21 @@ public class ErsUser {
                 Objects.equals(password, ersUser.password)&&
                 Objects.equals(given_name, ersUser.given_name)&&
                 Objects.equals(surname, ersUser.surname)&&
-                Objects.equals(is_active, ersUser.is_active);
+                Objects.equals(is_active, ersUser.is_active)&&
+                Objects.equals(user_role, ersUser.user_role);
+    }
+
+    @Override
+    public String toString() {
+        return "ErsUser{" +
+                "user_id='" + user_id + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", given_name='" + given_name + '\'' +
+                ", surname='" + surname + '\'' +
+                ", is_active=" + is_active +
+                ", user_role='" + user_role + '\'' +
+                '}';
     }
 }
