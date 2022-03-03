@@ -4,10 +4,13 @@ import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.foundationproject.dtos.requests.LoginRequest;
 import com.revature.foundationproject.dtos.responses.Principal;
+import com.revature.foundationproject.models.ErsUser;
 import com.revature.foundationproject.services.TokenService;
 import com.revature.foundationproject.services.UserService;
 import com.revature.foundationproject.util.exceptions.AuthenticationException;
 import com.revature.foundationproject.util.exceptions.InvalidRequestException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -17,6 +20,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class AuthServlet extends HttpServlet {
+
+    private static Logger logger = LogManager.getLogger(UserServlet.class);
+
     private final TokenService tokenService;
     private final UserService userService;
     private final ObjectMapper mapper;
@@ -61,5 +67,46 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
+    //Admin reactivate user account
 
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Principal requester = tokenService.extractRequesterDetails(req.getHeader("Authorization"));
+        System.out.println(requester);
+
+
+        if (requester == null) {
+            logger.warn("Unauthenticated request made to UserServlet#doGet");
+            resp.setStatus(401);
+            return;
+        }
+        if (!requester.getRole().equals("ADMIN")) {
+            logger.warn("Unauthorized request made by user: " + requester.getUsername());
+            resp.setStatus(403); // FORBIDDEN
+            return;
+        }
+
+        try {
+            ErsUser ersUser = mapper.readValue(req.getInputStream(), ErsUser.class);
+
+            String[] reqFrags = req.getRequestURI().split("/");
+            //[    ,  "foundation-project", "auth", ""]
+            if (reqFrags.length == 4 && reqFrags[3].equals("reactivate")) {
+                userService.reactivateUserAccountByAdmin(ersUser);
+                return;
+            }else if (reqFrags.length == 4 && reqFrags[3].equals("deactivate")) {
+                userService.deactivateUserAccountByAdmin(ersUser);
+                return;
+            }
+
+        }catch (Exception e) {
+            e.printStackTrace();
+            resp.setStatus(500);
+        }
+
+        //ResourcePersistenceException
+        //DataSourceException
+
+
+    }
 }
