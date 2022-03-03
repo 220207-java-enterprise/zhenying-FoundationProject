@@ -9,6 +9,11 @@ import com.revature.foundationproject.util.exceptions.AuthenticationException;
 import com.revature.foundationproject.util.exceptions.InvalidRequestException;
 import com.revature.foundationproject.util.exceptions.ResourceConflictException;
 
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.UUID;
 
 public class UserService {
@@ -20,7 +25,7 @@ public class UserService {
         this.userDAO = userDAO;
     }
 
-    public ErsUser register(NewUserRequest newUserRequest) {
+    public ErsUser register(NewUserRequest newUserRequest) throws NoSuchAlgorithmException {
         ErsUser newErsUser = newUserRequest.extractUser();
         String role_name = newUserRequest.getRole_name();
 
@@ -37,6 +42,17 @@ public class UserService {
             if (!emailAvailable) msg += "email";
             throw new ResourceConflictException(msg);
         }
+        //Hash password
+        String password = newErsUser.getPassword();
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] messageDigest = md.digest(password.getBytes());
+        BigInteger no = new BigInteger(1, messageDigest);
+        password = no.toString(16);
+        while (password.length() < 32) {
+            password = "0" + password;
+        }
+
+        newErsUser.setPassword(password);
 
         ErsUserRole userRole = userDAO.findUserRoleByRoleName(role_name);
         newErsUser.setUser_id(UUID.randomUUID().toString());
@@ -56,6 +72,7 @@ public class UserService {
       /*  if (!isUsernameValid(username) || !isPasswordValid(password)) {
             throw new InvalidRequestException("Invalid credentials provided!");
         }*/
+
 
         ErsUser authUser = userDAO.findUserByUsernameAndPassword(username, password);
 
