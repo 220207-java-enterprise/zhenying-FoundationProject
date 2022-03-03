@@ -308,6 +308,24 @@ public class ReimbursementDAO implements CrudDAO<ErsReimbursement>{
         return ersReimbType;
     }
 
+    public ErsReimbursement findReimbursementById(String reimb_id){
+        ErsReimbursement ersReimbursement = null;
+        try (Connection conn = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM ers_reimbursements er "+
+                                                            "WHERE er.reimb_id = ? ");
+            pstmt.setString(1, reimb_id);
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+                ersReimbursement = new ErsReimbursement();
+                ersReimbursement.setReimb_id(rs.getString("reimb_id"));
+                ersReimbursement.setResolved(rs.getTimestamp("resolved"));
+            }
+        }catch (SQLException e) {
+            throw new DataSourceException(e);
+        }
+        return ersReimbursement;
+    }
+
     public ErsUser findErsUserByUserId (String user_id){
         ErsUser ersUser = null;
 

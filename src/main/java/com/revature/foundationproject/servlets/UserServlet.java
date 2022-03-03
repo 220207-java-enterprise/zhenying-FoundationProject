@@ -32,17 +32,6 @@ public class UserServlet extends HttpServlet {
     }
 
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.getWriter().write("<h1>/users works!111</h1>");
-    }
-
-    /*@Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
-        resp.getWriter().write("<h1>/post works!111</h1>");
-    }*/
-
     // registration endpoint
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

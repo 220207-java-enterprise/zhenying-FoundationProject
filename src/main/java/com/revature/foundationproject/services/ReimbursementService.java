@@ -2,12 +2,15 @@ package com.revature.foundationproject.services;
 
 import com.revature.foundationproject.daos.ReimbursementDAO;
 import com.revature.foundationproject.daos.UserDAO;
+import com.revature.foundationproject.dtos.requests.ApproveOrDenyReimRequest;
 import com.revature.foundationproject.dtos.requests.ReimbRequest;
+import com.revature.foundationproject.dtos.responses.Principal;
 import com.revature.foundationproject.dtos.responses.ReimbursementResponse;
 import com.revature.foundationproject.models.ErsReimbStatus;
 import com.revature.foundationproject.models.ErsReimbType;
 import com.revature.foundationproject.models.ErsReimbursement;
 import com.revature.foundationproject.models.ErsUser;
+import com.revature.foundationproject.util.exceptions.ResourceConflictException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -77,6 +80,19 @@ public class ReimbursementService {
         List<ReimbursementResponse> reimbursementResponses = convertErsReimbursementListToResponse(ersReimbursements);
         return  reimbursementResponses;
     }
+
+    public void HandleReimbursementRequestByFM(ApproveOrDenyReimRequest approveOrDenyReimRequest,
+                                               Principal requester){
+        ErsUser ersUser = reimbursementDAO.findErsUserByUserId(requester.getUser_id());
+        ErsReimbursement ersReimbursement = reimbursementDAO.findReimbursementById(approveOrDenyReimRequest.getReimb_id());
+
+        if(ersReimbursement.getResolved() != null){
+            throw new ResourceConflictException("Reimbursement has been solved by someone");
+        }
+
+        reimbursementDAO.HandleReimbursementRequestByFM(ersUser, ersReimbursement, approveOrDenyReimRequest.isApprove());
+    }
+
 
     //Helper function
     List<ReimbursementResponse> convertErsReimbursementListToResponse(List<ErsReimbursement> ersReimbursementList){

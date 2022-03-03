@@ -67,13 +67,10 @@ public class AuthServlet extends HttpServlet {
         }
     }
 
-    //Admin reactivate user account
-
+    //Admin reactivate or deactivate a user account
     @Override
     protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Principal requester = tokenService.extractRequesterDetails(req.getHeader("Authorization"));
-        System.out.println(requester);
-
 
         if (requester == null) {
             logger.warn("Unauthenticated request made to UserServlet#doGet");

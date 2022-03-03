@@ -1,6 +1,7 @@
 package com.revature.foundationproject.servlets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.revature.foundationproject.dtos.requests.ApproveOrDenyReimRequest;
 import com.revature.foundationproject.dtos.requests.ReimbRequest;
 import com.revature.foundationproject.dtos.responses.Principal;
 import com.revature.foundationproject.dtos.responses.ReimbursementResponse;
@@ -8,6 +9,7 @@ import com.revature.foundationproject.models.ErsReimbursement;
 import com.revature.foundationproject.models.ErsUser;
 import com.revature.foundationproject.services.ReimbursementService;
 import com.revature.foundationproject.services.TokenService;
+import com.revature.foundationproject.util.exceptions.ResourceConflictException;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -28,6 +30,7 @@ public class ErsReimbursementServlet extends HttpServlet {
         this.mapper = mapper;
     }
 
+    //view reimbursements
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Principal requester = tokenService.extractRequesterDetails(req.getHeader("Authorization"));
@@ -63,7 +66,6 @@ public class ErsReimbursementServlet extends HttpServlet {
                 case "find-all-reimbs-FINANCE_MANAGER":
                     ersReimbursementList = reimbursementService.findAllSolvedReimbursementsByFM(requester.getUser_id());
                     break;
-
             }
 
             if(ersReimbursementList != null){
@@ -80,6 +82,7 @@ public class ErsReimbursementServlet extends HttpServlet {
         }
     }
 
+    //submit a new reimbursement
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Principal requester = tokenService.extractRequesterDetails(req.getHeader("Authorization"));
@@ -123,4 +126,34 @@ public class ErsReimbursementServlet extends HttpServlet {
 
     }
 
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Principal requester = tokenService.extractRequesterDetails(req.getHeader("Authorization"));
+
+        ApproveOrDenyReimRequest approveOrDenyReimRequest = mapper.readValue(req.getInputStream(), ApproveOrDenyReimRequest.class);
+
+        if (requester == null) {
+            resp.setStatus(401);
+            return;
+        }
+        if (!requester.getRole().equals("FINANCE_MANAGER")) {
+            resp.setStatus(403); // FORBIDDEN
+            return;
+        }
+
+        String[] reqFrags = req.getRequestURI().split("/");
+        //[    ,  "foundation-project", "reimbursements", "approve-or-deny"]
+        if (reqFrags.length == 4 && !reqFrags[3].equals("approve-or-deny")) {
+            resp.setStatus(404);
+        }
+
+        try {
+            reimbursementService.HandleReimbursementRequestByFM(approveOrDenyReimRequest, requester);
+        }catch (ResourceConflictException e){
+            resp.setStatus(409);
+        }catch (Exception e) {
+            resp.setStatus(500);
+        }
+    }
 }
