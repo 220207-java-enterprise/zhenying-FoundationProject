@@ -46,7 +46,15 @@ public class ReimbursementService {
 
         return  ersReimbursements;
     }
-    
+
+    public List<ErsReimbursement> findAllReimbursementsByEmployee(String employee_id){
+        ErsUser ersUser = reimbursementDAO.findErsUserByUserId(employee_id);
+        List <ErsReimbursement>  ersReimbursements =
+                reimbursementDAO.findAllReimbursementsByErsUser(ersUser);
+
+        return  ersReimbursements;
+    }
+
 
     //For Finance Manager
     public List<ErsReimbursement> findAllPendingReimbursementsByFM(){
@@ -55,6 +63,15 @@ public class ReimbursementService {
 
         return  ersReimbursements;
     }
+
+    public List<ErsReimbursement> findAllSolvedReimbursementsByFM(String FM_id){
+        ErsUser ersUser = reimbursementDAO.findErsUserByUserId(FM_id);
+        List <ErsReimbursement>  ersReimbursements =
+                reimbursementDAO.findAllSolvedReimbursementsByFM(ersUser);
+
+        return  ersReimbursements;
+    }
+
 
 
 }

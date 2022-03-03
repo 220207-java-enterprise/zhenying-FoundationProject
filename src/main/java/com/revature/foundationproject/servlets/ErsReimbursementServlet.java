@@ -53,10 +53,15 @@ public class ErsReimbursementServlet extends HttpServlet {
                 case "find-all-pending-reimbs-EMPLOYEE":
                     ersReimbursementList = reimbursementService.findAllPendingReimbursementsByEmployee(requester.getUser_id());
                     break;
+                case "find-all-reimbs-EMPLOYEE":
+                    ersReimbursementList = reimbursementService.findAllReimbursementsByEmployee(requester.getUser_id());
+                    break;
                 case "find-all-pending-reimbs-FINANCE_MANAGER":
                     ersReimbursementList = reimbursementService.findAllPendingReimbursementsByFM();
                     break;
-
+                case "find-all-reimbs-FINANCE_MANAGER":
+                    ersReimbursementList = reimbursementService.findAllSolvedReimbursementsByFM(requester.getUser_id());
+                    break;
 
             }
 
@@ -64,6 +69,8 @@ public class ErsReimbursementServlet extends HttpServlet {
                 String payload = mapper.writeValueAsString(ersReimbursementList);
                 resp.setContentType("application/json");
                 resp.getWriter().write(payload);
+            }else {
+                resp.setStatus(403);
             }
 
         }catch (Exception e) {
