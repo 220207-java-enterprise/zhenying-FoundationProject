@@ -112,7 +112,6 @@
                                 <exclude>com/revature/foundationproject/util/exceptions/*</exclude>
                                 <exclude>com/revature/foundationproject/servlets/*</exclude>
                                 <exclude>com/revature/foundationproject/daos/*</exclude>
-                                <exclude>con/revature/foundationproject/screens/*</exclude>
                             </excludes>
                         </configuration>
                     </execution>
