@@ -5,10 +5,8 @@ import com.revature.foundationproject.util.ConnectionFactory;
 import com.revature.foundationproject.util.exceptions.DataSourceException;
 import com.revature.foundationproject.util.exceptions.ResourcePersistenceException;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -248,13 +246,22 @@ public class ReimbursementDAO implements CrudDAO<ErsReimbursement>{
             }else{
                 ersReimbStatus = findReimbStatusByStatusName("DENIED");
             }
-            PreparedStatement pstmt = conn.prepareStatement("UPDATE ers_reimbursements "+
-                                                                "SET resolved = ? "+
-                                                                "resolver_id = ? "+
-                                                                "status_id =  ?");
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE ers_reimbursements er "+
+                                                                "SET resolved = ? , "+
+                                                                "resolver_id = ? , "+
+                                                                "status_id =  ? " +
+                                                                "WHERE  er.reimb_id = ?");
 
+            pstmt.setTimestamp(1, Timestamp.from(Instant.now()));
+            pstmt.setString(2,ersUserFM.getUser_id());
+            pstmt.setString(3,ersReimbStatus.getStatus_id());
+            pstmt.setString(4,ersReimbursement.getReimb_id());
 
-
+            int handleReimbRequest = pstmt.executeUpdate();
+            if (handleReimbRequest != 1) {
+                conn.rollback();
+                throw new ResourcePersistenceException("Failed to persist user to data source");
+            }
 
             conn.commit();
         } catch (SQLException e) {
@@ -280,6 +287,53 @@ public class ReimbursementDAO implements CrudDAO<ErsReimbursement>{
             throw new DataSourceException(e);
         }
         return ersReimbStatus;
+    }
+
+    public ErsReimbType findReimbTypeByTpeName(String type_name){
+        ErsReimbType ersReimbType = null;
+
+        try (Connection conn = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM ers_reimbursement_types "+
+                    "WHERE type = ?");
+            pstmt.setString(1, type_name);
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+                ersReimbType = new ErsReimbType();
+                ersReimbType.setType_id(rs.getString("type_id"));
+                ersReimbType.setType(rs.getString("type"));
+            }
+        }catch (SQLException e) {
+            throw new DataSourceException(e);
+        }
+        return ersReimbType;
+    }
+
+    public ErsUser findErsUserByUserId (String user_id){
+        ErsUser ersUser = null;
+
+        try (Connection conn = ConnectionFactory.getInstance().getConnection()) {
+            PreparedStatement pstmt = conn.prepareStatement("SELECT * FROM ers_users eu "+
+                                                                "JOIN ers_user_roles eur "+
+                                                                "ON eur.role_id = eu.role_id "+
+                                                                "WHERE user_id = ?");
+            pstmt.setString(1, user_id);
+            ResultSet rs = pstmt.executeQuery();
+            if(rs.next()){
+                ersUser = new ErsUser();
+                ersUser.setUser_id(rs.getString("user_id"));
+                ersUser.setUsername(rs.getString("username"));
+                ersUser.setEmail(rs.getString("email"));
+                ersUser.setPassword(rs.getString("password"));
+                ersUser.setGiven_name(rs.getString("given_name"));
+                ersUser.setSurname(rs.getString("surname"));
+                ersUser.setIs_active(rs.getBoolean("is_active"));
+                ersUser.setRole(new ErsUserRole(rs.getString("role_id"), rs.getString("role")));
+
+            }
+        }catch (SQLException e) {
+            throw new DataSourceException(e);
+        }
+        return ersUser;
     }
 
     @Override
