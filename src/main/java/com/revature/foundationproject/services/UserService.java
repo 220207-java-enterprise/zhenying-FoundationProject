@@ -40,7 +40,7 @@ public class UserService {
 
         ErsUserRole userRole = userDAO.findUserRoleByRoleName(role_name);
         newErsUser.setUser_id(UUID.randomUUID().toString());
-        newErsUser.setIs_active(true);
+        newErsUser.setIs_active(false);
         newErsUser.setRole(userRole);
 
         userDAO.save(newErsUser);
@@ -59,12 +59,20 @@ public class UserService {
 
         ErsUser authUser = userDAO.findUserByUsernameAndPassword(username, password);
 
-        if (authUser == null) {
+        if (authUser == null || !authUser.getIs_active()) {
             throw new AuthenticationException();
         }
 
         return authUser;
 
+    }
+
+    public void reactivateUserAccountByAdmin(ErsUser ersUser){
+        userDAO.reactivateUserAccount(ersUser);
+    }
+
+    public void deactivateUserAccountByAdmin(ErsUser ersUser){
+        userDAO.deactivateUserAccount(ersUser);
     }
 
     private boolean isUserValid(ErsUser ersUser) {
