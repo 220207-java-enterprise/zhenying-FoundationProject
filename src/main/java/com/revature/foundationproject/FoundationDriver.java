@@ -7,14 +7,17 @@ import com.revature.foundationproject.models.ErsReimbType;
 import com.revature.foundationproject.models.ErsReimbursement;
 import com.revature.foundationproject.models.ErsUser;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 
 public class FoundationDriver {
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
 
-        UserDAO userDAO = new UserDAO();
+        /*UserDAO userDAO = new UserDAO();
         ReimbursementDAO reimbursementDAO = new ReimbursementDAO();
 
         ErsUser ersUser_employee = new ErsUser("user2","user2@gmail.com","123456","user2","user2");
@@ -31,7 +34,7 @@ public class FoundationDriver {
                 null, null,ersUser_employee,
                 null,ersReimbStatus, ersReimbType);
 
-        reimbursementDAO.HandleReimbursementRequestByFM(ersUser_FM, ersReimbursement, true);
+        reimbursementDAO.HandleReimbursementRequestByFM(ersUser_FM, ersReimbursement, true);*/
         //reimbursementDAO.submitNewReimbursementRequestByErsUser(ersReimbursement);
 
         //List<ErsReimbursement> ersReimbursementList = reimbursementDAO.findAllReimbursementsByErsUser(ersUser);
@@ -48,5 +51,15 @@ public class FoundationDriver {
         /*ErsUser ersUser2 = userDAO.findUserByUsername("user2");
         userDAO.reactivateUserAccount(ersUser2);
         System.out.println(ersUser2);*/
+
+        String password = "Revature?99";
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] messageDigest = md.digest(password.getBytes());
+        BigInteger no = new BigInteger(1, messageDigest);
+        password = no.toString(16);
+        while (password.length() < 32) {
+            password = "0" + password;
+        }
+        System.out.println(password);
     }
 }

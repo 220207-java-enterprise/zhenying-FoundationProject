@@ -64,15 +64,22 @@ public class UserService {
         return newErsUser;
     }
 
-    public ErsUser login(LoginRequest loginRequest) {
+    public ErsUser login(LoginRequest loginRequest) throws NoSuchAlgorithmException {
 
         String username = loginRequest.getUsername();
         String password = loginRequest.getPassword();
 
-      /*  if (!isUsernameValid(username) || !isPasswordValid(password)) {
+        if (!isUsernameValid(username) || !isPasswordValid(password)) {
             throw new InvalidRequestException("Invalid credentials provided!");
-        }*/
-
+        }
+        //Hash password
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] messageDigest = md.digest(password.getBytes());
+        BigInteger no = new BigInteger(1, messageDigest);
+        password = no.toString(16);
+        while (password.length() < 32) {
+            password = "0" + password;
+        }
 
         ErsUser authUser = userDAO.findUserByUsernameAndPassword(username, password);
 

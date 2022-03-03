@@ -52,12 +52,16 @@ public class UserServlet extends HttpServlet {
         try {
 
             NewUserRequest newUserRequest = mapper.readValue(req.getInputStream(), NewUserRequest.class);
-            ErsUser newUser = userService.register(newUserRequest);
-            resp.setStatus(201); // CREATED
-            resp.setContentType("application/json");
-            String payload = mapper.writeValueAsString(new ResourceCreationResponse(newUser.getUser_id()));
-            respWriter.write(payload);
-
+            if(newUserRequest.getRole_name().equals("EMPLOYEE") || newUserRequest.getRole_name().equals("FINANCE_MANAGER")){
+                System.out.println("Here");
+                ErsUser newUser = userService.register(newUserRequest);
+                resp.setStatus(201); // CREATED
+                resp.setContentType("application/json");
+                String payload = mapper.writeValueAsString(new ResourceCreationResponse(newUser.getUser_id()));
+                respWriter.write(payload);
+            }else {
+                resp.setStatus(400);
+            }
         } catch (InvalidRequestException | DatabindException e) {
             resp.setStatus(400); // BAD REQUEST
         } catch (ResourceConflictException e) {

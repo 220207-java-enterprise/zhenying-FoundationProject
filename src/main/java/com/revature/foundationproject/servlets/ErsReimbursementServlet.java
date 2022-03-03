@@ -3,6 +3,7 @@ package com.revature.foundationproject.servlets;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.foundationproject.dtos.requests.ReimbRequest;
 import com.revature.foundationproject.dtos.responses.Principal;
+import com.revature.foundationproject.dtos.responses.ReimbursementResponse;
 import com.revature.foundationproject.models.ErsReimbursement;
 import com.revature.foundationproject.models.ErsUser;
 import com.revature.foundationproject.services.ReimbursementService;
@@ -47,7 +48,7 @@ public class ErsReimbursementServlet extends HttpServlet {
             //[    ,  "foundation-project", "reimbursements", "find-all-reimbs-"]
 
             String cases = reqFrags[3]+requester.getRole();
-            List<ErsReimbursement> ersReimbursementList = null;
+            List<ReimbursementResponse> ersReimbursementList = null;
 
             switch (cases){
                 case "find-all-pending-reimbs-EMPLOYEE":
