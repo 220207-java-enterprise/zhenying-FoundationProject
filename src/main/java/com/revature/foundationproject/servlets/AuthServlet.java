@@ -3,7 +3,9 @@ package com.revature.foundationproject.servlets;
 import com.fasterxml.jackson.databind.DatabindException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.revature.foundationproject.dtos.requests.LoginRequest;
+import com.revature.foundationproject.dtos.requests.ResetPasswordRequest;
 import com.revature.foundationproject.dtos.responses.Principal;
+import com.revature.foundationproject.dtos.responses.ReimbursementResponse;
 import com.revature.foundationproject.models.ErsUser;
 import com.revature.foundationproject.services.TokenService;
 import com.revature.foundationproject.services.UserService;
@@ -84,18 +86,31 @@ public class AuthServlet extends HttpServlet {
         }
 
         try {
-            ErsUser ersUser = mapper.readValue(req.getInputStream(), ErsUser.class);
 
             String[] reqFrags = req.getRequestURI().split("/");
             //[    ,  "foundation-project", "auth", ""]
             if (reqFrags.length == 4 && reqFrags[3].equals("reactivate")) {
+                ErsUser ersUser = mapper.readValue(req.getInputStream(), ErsUser.class);
                 userService.reactivateUserAccountByAdmin(ersUser);
+                resp.setStatus(201);
                 return;
             }else if (reqFrags.length == 4 && reqFrags[3].equals("deactivate")) {
+                ErsUser ersUser = mapper.readValue(req.getInputStream(), ErsUser.class);
                 userService.deactivateUserAccountByAdmin(ersUser);
+                resp.setStatus(204);
+                return;
+            }else if (reqFrags.length == 4 && reqFrags[3].equals("reset-password")){
+                ResetPasswordRequest resetPasswordRequest = mapper.readValue(req.getInputStream(), ResetPasswordRequest.class);
+                System.out.println(resetPasswordRequest);
+                userService.resetPasswordByAdmin(resetPasswordRequest);
+                resp.setStatus(201);
+                return;
+            }else {
+                resp.setStatus(404);
                 return;
             }
-
+        } catch (InvalidRequestException e) {
+            resp.setStatus(400);
         }catch (Exception e) {
             e.printStackTrace();
             resp.setStatus(500);

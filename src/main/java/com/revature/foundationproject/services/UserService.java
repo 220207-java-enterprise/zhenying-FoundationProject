@@ -3,6 +3,7 @@ package com.revature.foundationproject.services;
 import com.revature.foundationproject.daos.UserDAO;
 import com.revature.foundationproject.dtos.requests.LoginRequest;
 import com.revature.foundationproject.dtos.requests.NewUserRequest;
+import com.revature.foundationproject.dtos.requests.ResetPasswordRequest;
 import com.revature.foundationproject.models.ErsUser;
 import com.revature.foundationproject.models.ErsUserRole;
 import com.revature.foundationproject.util.exceptions.AuthenticationException;
@@ -91,12 +92,33 @@ public class UserService {
 
     }
 
+
+
     public void reactivateUserAccountByAdmin(ErsUser ersUser){
         userDAO.reactivateUserAccount(ersUser);
     }
 
     public void deactivateUserAccountByAdmin(ErsUser ersUser){
         userDAO.deactivateUserAccount(ersUser);
+    }
+
+    public void  resetPasswordByAdmin(ResetPasswordRequest resetPasswordRequest) throws NoSuchAlgorithmException {
+        ErsUser ersUser = userDAO.findUserById(resetPasswordRequest.getUser_id());
+
+        String newPassword = resetPasswordRequest.getNew_password();
+        if (ersUser == null || !isPasswordValid(newPassword)){
+            throw  new InvalidRequestException("Bad registration details given.");
+        }
+
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] messageDigest = md.digest(newPassword.getBytes());
+        BigInteger no = new BigInteger(1, messageDigest);
+        newPassword = no.toString(16);
+        while (newPassword.length() < 32) {
+            newPassword = "0" + newPassword;
+        }
+
+        userDAO.updateUserPassword(ersUser,newPassword);
     }
 
     private boolean isUserValid(ErsUser ersUser) {
